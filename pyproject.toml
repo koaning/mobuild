@@ -1,0 +1,36 @@
+[project]
+name = "mobuild"
+version = "0.1.1"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "koaning", email = "vincentwarmerdam@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = ["typer", "marimo", "cookiecutter"]
+
+[project.scripts]
+mobuild = "mobuild:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+include = [
+    "src/mobuild/**"
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mobuild"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/mobuild/**",
+    "README.md",
+    "LICENSE"
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
