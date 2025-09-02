@@ -8,7 +8,7 @@ import importlib.resources as resources
 import hashlib
 import sys
 
-app = typer.Typer()
+app = typer.Typer(no_args_is_help=True)
 
 def _write_file(file: Path, out_folder: Path):
         abs_path = str(Path(file).resolve())
@@ -35,7 +35,7 @@ def _write_file(file: Path, out_folder: Path):
                 code_export += codes[i].replace("## Export", "") + "\n"
         Path(out_folder / file.name).write_text(code_export)
 
-@app.command()
+@app.command(no_args_is_help=True)
 def export(input_folder: Path, output_folder: Path):
     """Build a Python library from a folder of Marimo notebooks."""
     if not Path(input_folder).exists():
@@ -52,7 +52,7 @@ def export(input_folder: Path, output_folder: Path):
             typer.echo(f"Error loading {file}: {e}")
             
 
-@app.command()
+@app.command(no_args_is_help=True)
 def init(name: str, output_folder: Path = Path(".")):
     """Render a new project into the given output folder.
 

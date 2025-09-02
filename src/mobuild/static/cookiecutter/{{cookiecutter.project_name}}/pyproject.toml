@@ -3,9 +3,7 @@ name = "{{ cookiecutter.project_name }}"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-authors = [
-    { name = "koaning", email = "vincentwarmerdam@gmail.com" }
-]
+authors = []
 requires-python = ">=3.12"
 dependencies = ["marimo"]
 
