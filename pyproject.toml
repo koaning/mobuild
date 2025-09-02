@@ -7,8 +7,12 @@ authors = [
     { name = "koaning", email = "vincentwarmerdam@gmail.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = ["typer", "marimo"]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
