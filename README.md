@@ -10,7 +10,7 @@ This package let's you construct Python packages from notebooks. You can add "##
 
 Turn a folder of Marimo notebooks into plain Python files in an output folder.
 
-```bash
+```
 uvx mobuild export path/to/nbs path/to/output_src
 ```
 
@@ -18,7 +18,7 @@ uvx mobuild export path/to/nbs path/to/output_src
 
 Create a new project from the bundled template.
 
-```bash
+```
 uvx mobuild init my_project_name --output-folder .
 ```
 
