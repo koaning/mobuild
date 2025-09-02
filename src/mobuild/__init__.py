@@ -53,17 +53,18 @@ def export(input_folder: Path, output_folder: Path):
             
 
 @app.command()
-def init(output_folder: Path = Path(".")):
+def init(name: str, output_folder: Path = Path(".")):
     """Render a new project into the given output folder.
 
     Expects the template assets to live under the installed package at
     `mobuild/(cookiecutter/` with a `cookiecutter.json`.
     """
     cookie_folder = Path(__file__).parent / "static" / "cookiecutter"
-    print(list(cookie_folder.glob("*")))
     cookiecutter(
         str(cookie_folder),
         output_dir=str(output_folder), 
+        extra_context={"project_name": name},
+        no_input=True
     )
 
 def runtime_sync(output_folder: Path):
