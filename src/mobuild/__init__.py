@@ -1,11 +1,14 @@
+from cookiecutter.main import cookiecutter
 import typer 
 from marimo._ast.app import InternalApp
 from pathlib import Path
 import importlib
 import importlib.util
+import importlib.resources as resources
 import hashlib
 import sys
 
+app = typer.Typer()
 
 def _write_file(file: Path, out_folder: Path):
         abs_path = str(Path(file).resolve())
@@ -32,8 +35,8 @@ def _write_file(file: Path, out_folder: Path):
                 code_export += codes[i].replace("## Export", "") + "\n"
         Path(out_folder / file.name).write_text(code_export)
 
-
-def build(input_folder: Path, output_folder: Path):
+@app.command()
+def export(input_folder: Path, output_folder: Path):
     """Build a Python library from a folder of Marimo notebooks."""
     if not Path(input_folder).exists():
         typer.echo(f"Input folder {input_folder} does not exist")
@@ -49,8 +52,19 @@ def build(input_folder: Path, output_folder: Path):
             typer.echo(f"Error loading {file}: {e}")
             
 
-def init(output_folder: Path):
-    pass
+@app.command()
+def init(output_folder: Path = Path(".")):
+    """Render a new project into the given output folder.
+
+    Expects the template assets to live under the installed package at
+    `mobuild/(cookiecutter/` with a `cookiecutter.json`.
+    """
+    cookie_folder = Path(__file__).parent / "static" / "cookiecutter"
+    print(list(cookie_folder.glob("*")))
+    cookiecutter(
+        str(cookie_folder),
+        output_dir=str(output_folder), 
+    )
 
 def runtime_sync(output_folder: Path):
     """Write the current marimo notebook to the output folder as a normal Python file."""
