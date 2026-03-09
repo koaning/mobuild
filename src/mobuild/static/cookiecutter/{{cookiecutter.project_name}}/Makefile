@@ -12,4 +12,4 @@ clean:
 	rm -rf .pytest_cache/
 
 build:
-	uv run mobuild export nbs src
+	uv run mobuild export nbs/__init__.py src
