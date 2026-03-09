@@ -9,6 +9,9 @@ authors = [
 requires-python = ">=3.12"
 dependencies = ["typer", "marimo", "cookiecutter"]
 
+[project.optional-dependencies]
+dev = ["pytest"]
+
 [project.scripts]
 mobuild = "mobuild:app"
 
