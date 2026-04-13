@@ -31,7 +31,7 @@ def _collect_top_level_names(code: str) -> list[str]:
     return names
 
 
-def _write_file(file: Path, out_folder: Path):
+def _write_file(file: Path, out_path: Path):
     """Extract exported code from a single marimo notebook and write it as a plain Python file.
 
     Marimo notebooks are valid Python files. Each notebook defines a global ``app``
@@ -45,7 +45,7 @@ def _write_file(file: Path, out_folder: Path):
          execution order.
       3. Selects only cells whose source code contains the ``## EXPORT`` marker.
       4. Concatenates those cells in execution order (respecting the DAG) and
-         writes the result to ``out_folder/<notebook_filename>``.
+         writes the result to ``out_path``.
       5. Prepends an ``__all__`` so the generated module only exposes the
          public names that were explicitly exported.
 
@@ -93,19 +93,22 @@ def _write_file(file: Path, out_folder: Path):
     if names:
         code_export = "__all__ = " + repr(names) + "\n\n" + code_export
 
-    (out_folder / file.name).write_text(code_export)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(code_export)
 
 
 @app.command(no_args_is_help=True)
-def export(input_file: Path, output_folder: Path):
+def export(input_file: Path, output_path: Path):
     """Build a Python file from a single Marimo notebook."""
     input_file = Path(input_file)
-    output_folder = Path(output_folder)
+    output_path = Path(output_path)
     if not input_file.exists():
         typer.echo(f"Input file {input_file} does not exist")
         raise typer.Exit(1)
-    output_folder.mkdir(parents=True, exist_ok=True)
-    _write_file(input_file, output_folder)
+    if output_path.is_dir():
+        typer.echo(f"Output path {output_path} is a directory, please provide a file path")
+        raise typer.Exit(1)
+    _write_file(input_file, output_path)
 
 
 @app.command(no_args_is_help=True)
@@ -124,6 +127,6 @@ def init(name: str, output_folder: Path = Path(".")):
     )
 
 
-def runtime_sync(output_folder: Path):
-    """Write the current marimo notebook to the output folder as a normal Python file."""
-    _write_file(__file__, output_folder)
+def runtime_sync(output_path: Path):
+    """Write the current marimo notebook to the given output path as a normal Python file."""
+    _write_file(Path(__file__), output_path)
