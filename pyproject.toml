@@ -1,7 +1,7 @@
 [project]
 name = "mobuild"
-version = "0.2.0"
-description = "Add your description here"
+version = "0.3.0"
+description = "A minimal build tool to turn marimo notebooks into Python packages."
 readme = "README.md"
 authors = [
     { name = "koaning", email = "vincentwarmerdam@gmail.com" }

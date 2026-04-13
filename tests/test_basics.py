@@ -1,11 +1,12 @@
+import click
+import pytest
 from mobuild import export, init
 
 
 def test_basics(tmp_path):
-    out_dir = tmp_path / "proj1_out"
-    out_dir.mkdir()
-    export(input_file="tests/proj1/__init__.py", output_folder=out_dir)
-    out = (out_dir / "__init__.py").read_text()
+    out_file = tmp_path / "proj1_out" / "__init__.py"
+    export(input_file="tests/proj1/__init__.py", output_path=out_file)
+    out = out_file.read_text()
     assert "a = 1" in out
     assert "b = 2" not in out
     assert "## export" not in out.lower()  # Marker should be stripped
@@ -13,12 +14,20 @@ def test_basics(tmp_path):
     assert "'a'" in out
 
 
+def test_custom_output_name(tmp_path):
+    """The user can pick any file name for the output."""
+    out_file = tmp_path / "my_module.py"
+    export(input_file="tests/proj1/__init__.py", output_path=out_file)
+    out = out_file.read_text()
+    assert "a = 1" in out
+    assert '__all__' in out
+
+
 def test_selective_export(tmp_path):
     """Only cells marked with ## EXPORT should appear in the output."""
-    out_dir = tmp_path / "proj2_out"
-    out_dir.mkdir()
-    export(input_file="tests/proj2/__init__.py", output_folder=out_dir)
-    out = (out_dir / "__init__.py").read_text()
+    out_file = tmp_path / "proj2_out" / "__init__.py"
+    export(input_file="tests/proj2/__init__.py", output_path=out_file)
+    out = out_file.read_text()
 
     # Exported definitions should be present
     assert "def greet" in out
@@ -40,6 +49,14 @@ def test_selective_export(tmp_path):
     assert "'DEFAULT_SEP'" in out
     assert "_private_helper" not in out
 
+
+
+def test_folder_is_not_sufficient(tmp_path):
+    """Passing a directory instead of a file path should fail."""
+    out_dir = tmp_path / "some_folder"
+    out_dir.mkdir()
+    with pytest.raises(click.exceptions.Exit):
+        export(input_file="tests/proj1/__init__.py", output_path=out_dir)
 
 
 def test_init(tmp_path):
