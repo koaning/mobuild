@@ -1,6 +1,9 @@
+import importlib.util
+import textwrap
+
 import click
 import pytest
-from mobuild import export, init
+from mobuild import export, init, runtime_sync
 
 
 def test_basics(tmp_path):
@@ -64,3 +67,51 @@ def test_init(tmp_path):
     init(name="output", output_folder=tmp_path)
     assert (out_dir / "nbs" / "__init__.py").exists()
     assert (out_dir / "pyproject.toml").exists()
+
+
+def test_runtime_sync_uses_caller_file(tmp_path):
+    """runtime_sync should resolve the caller's notebook, not mobuild/__init__.py."""
+    notebook_path = tmp_path / "my_nb.py"
+    out_file = tmp_path / "out.py"
+
+    notebook_path.write_text(textwrap.dedent(f"""
+        import marimo
+        from mobuild import runtime_sync
+        from pathlib import Path
+
+        __generated_with = "0.15.2"
+        app = marimo.App()
+
+
+        @app.cell
+        def _():
+            ## EXPORT
+
+            def add_one(n):
+                return n + 1
+            return
+
+
+        @app.cell
+        def _():
+            def not_exported():
+                return "nope"
+            return
+
+
+        def do_sync():
+            runtime_sync(Path({str(out_file)!r}))
+    """))
+
+    spec = importlib.util.spec_from_file_location("test_runtime_sync_nb", str(notebook_path))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.do_sync()
+
+    assert out_file.exists()
+    contents = out_file.read_text()
+    assert "def add_one(n):" in contents
+    assert "def not_exported" not in contents
+    assert "__all__" in contents
+    assert "'add_one'" in contents
+    assert "## export" not in contents.lower()

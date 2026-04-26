@@ -1,6 +1,7 @@
 import ast
 import hashlib
 import importlib.util
+import inspect
 import re
 import sys
 
@@ -129,4 +130,5 @@ def init(name: str, output_folder: Path = Path(".")):
 
 def runtime_sync(output_path: Path):
     """Write the current marimo notebook to the given output path as a normal Python file."""
-    _write_file(Path(__file__), output_path)
+    caller_file = Path(inspect.stack()[1].filename)
+    _write_file(caller_file, output_path)
